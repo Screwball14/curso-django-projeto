@@ -173,4 +173,9 @@ class RecipeSearchViewTest(RecipeTestBase):
             slug='002', author_data={'username': '2'}
         )
 
-        response = self.client.get(reverse('recipes:search'))
+        url = reverse('recipes:search')
+
+        response1 = self.client.get(f'{url}?q={title1}')
+        response2 = self.client.get(f'{url}?q={title2}')
+
+        self.assertIn(recipe1, response1.context['recipes'])
