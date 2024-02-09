@@ -163,8 +163,8 @@ class RecipeSearchViewTest(RecipeTestBase):
         )    
 
     def test_recipe_search_can_find_recipe_bytitle(self):
-        title1 = 'This is a Recipe'
-        title2 = 'This is a Recipe TOO'
+        title1 = 'This is Recipe one'
+        title2 = 'this is Recipe two'
 
         recipe1 = self.make_recipe(
             slug='001', title=title1, author_data={'username': '1'}
@@ -177,5 +177,31 @@ class RecipeSearchViewTest(RecipeTestBase):
 
         response1 = self.client.get(f'{url}?q={title1}')
         response2 = self.client.get(f'{url}?q={title2}')
+        response_both = self.client.get(f'{url}?q=this')
 
         self.assertIn(recipe1, response1.context['recipes'])
+        self.assertNotIn(recipe2, response1.context['recipes'])
+        self.assertIn(recipe1, response_both.context['recipes'])
+        self.assertIn(recipe2, response_both.context['recipes'])
+
+    def test_recipe_search_bydescription(self):
+        description1 = 'a cake'
+        description2 = 'a pie'
+
+        recipe1 = self.make_recipe(
+            slug='a-a', description='This is how to make a Cake',
+              author_data={'username':'victor'}
+        )
+        recipe2 = self.make_recipe(
+            slug='b-b', description='This is how to make a Pie'
+        )
+
+        response1 = self.client.get(reverse('recipes:search')+f'?q={description1}')
+        response2 = self.client.get(reverse('recipes:search')+f'?q={description2}')
+        response_both = self.client.get(reverse('recipes:search')+f'?q=this')
+
+        self.assertIn(recipe1, response1.context['recipes'])
+        self.assertNotIn(recipe2, response1.context['recipes'])
+
+        self.assertIn(recipe1, response_both.context['recipes'])
+        self.assertIn(recipe2, response_both.context['recipes'])
